@@ -23,27 +23,32 @@ public class UserController {
 
     @GetMapping
     public List<UserDto> getAllUsers() {
+        log.info("Поступил запрос на получение всех User");
         return userService.getAll();
     }
 
     @GetMapping("/{id}")
     public UserDto getUserById(@PathVariable Long id) {
+        log.info("Поступил запрос на получение User с id = {}", id);
         return userService.getById(id);
     }
 
     @PostMapping
     public User create(@Validated(CreateUserGroup.class) @RequestBody User user) {
+        log.info("Поступил запрос на создание User с телом {}", user);
         return userService.create(user);
     }
 
     @PatchMapping("/{id}")
     public User update(@PathVariable Long id,
                        @Validated(UpdateUserGroup.class) @RequestBody User user) {
+        log.info("Поступил запрос на обновление User с id = {} с телом {}", id, user);
         return userService.update(id, user);
     }
 
     @DeleteMapping("/{id}")
     public void deleteById(@PathVariable Long id) {
+        log.info("Поступил запрос на удаление User с id = {}", id);
         userService.deleteById(id);
     }
 }

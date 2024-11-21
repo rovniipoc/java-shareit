@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.validation.CreateItemGroup;
 
 /**
  * TODO Sprint add-controllers.
@@ -15,12 +16,12 @@ import ru.practicum.shareit.request.ItemRequest;
 public class Item {
     @Positive
     private Long id;
-    @NotBlank
+    @NotBlank(groups = CreateItemGroup.class)
     private String name;
-    @NotBlank
+    @NotBlank(groups = CreateItemGroup.class)
     private String description;
-    @NotNull
-    private Boolean isAvailable = true;
+    @NotNull(groups = CreateItemGroup.class)
+    private Boolean available;
     private Long owner;
     private ItemRequest request;
 }

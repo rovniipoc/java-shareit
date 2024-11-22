@@ -39,12 +39,12 @@ public class InMemoryItemRepository implements ItemRepository {
     }
 
     @Override
-    public Item update(Long itemId, Item item) {
-        Item currentItem = items.get(itemId);
+    public Item update(Item item) {
+        Item currentItem = items.get(item.getId());
         currentItem.setName(item.getName());
         currentItem.setDescription(item.getDescription());
         currentItem.setAvailable(item.getAvailable());
-        items.put(itemId, currentItem);
+        items.put(item.getId(), currentItem);
         return currentItem;
     }
 

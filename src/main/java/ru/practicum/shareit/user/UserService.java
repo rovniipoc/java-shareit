@@ -31,13 +31,14 @@ public class UserService {
     public User update(Long id, User user) {
         checkExistByUserId(id);
         checkDuplicateUserByEmail(user);
+        user.setId(id);
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(userRepository.getById(id).getName());
         }
         if (user.getEmail() == null || user.getEmail().isBlank()) {
             user.setEmail(userRepository.getById(id).getEmail());
         }
-        return userRepository.update(id, user);
+        return userRepository.update(user);
     }
 
     public void deleteById(Long id) {

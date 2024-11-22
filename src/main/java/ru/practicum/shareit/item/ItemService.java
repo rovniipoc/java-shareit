@@ -45,6 +45,7 @@ public class ItemService {
         checkExistUserById(userId);
         Item currentItem = itemRepository.getById(itemId);
         checkUserOwner(userId, currentItem);
+        item.setId(itemId);
 
         if (item.getName() == null || item.getName().isBlank()) {
             item.setName(currentItem.getName());
@@ -55,7 +56,7 @@ public class ItemService {
         if (item.getAvailable() == null) {
             item.setAvailable(currentItem.getAvailable());
         }
-        return itemRepository.update(itemId, item);
+        return itemRepository.update(item);
     }
 
     public void deleteById(Long userId, Long itemId) {

@@ -27,11 +27,11 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     @Override
-    public User update(Long id, User user) {
-        User currentUser = users.get(id);
+    public User update(User user) {
+        User currentUser = users.get(user.getId());
         currentUser.setName(user.getName());
         currentUser.setEmail(user.getEmail());
-        users.put(id, currentUser);
+        users.put(user.getId(), currentUser);
         return currentUser;
     }
 

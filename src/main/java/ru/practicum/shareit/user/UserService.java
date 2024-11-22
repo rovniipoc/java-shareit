@@ -3,7 +3,6 @@ package ru.practicum.shareit.user;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 
@@ -24,13 +23,11 @@ public class UserService {
     }
 
     public User create(User user) {
-        checkDuplicateUserByEmail(user);
         return userRepository.create(user);
     }
 
     public User update(Long id, User user) {
         checkExistByUserId(id);
-        checkDuplicateUserByEmail(user);
         user.setId(id);
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(userRepository.getById(id).getName());
@@ -49,15 +46,6 @@ public class UserService {
     private void checkExistByUserId(Long id) {
         if (userRepository.getById(id) == null) {
             throw new NotFoundException("Пользователь с id = " + id + " не существует");
-        }
-    }
-
-    private void checkDuplicateUserByEmail(User user) {
-        List<User> duplicateUsers = userRepository.getAll().stream()
-                .filter(u -> u.getEmail().equals(user.getEmail()))
-                .toList();
-        if (!duplicateUsers.isEmpty()) {
-            throw new ValidationException("Пользователь с email = " + user.getEmail() + " уже существует");
         }
     }
 }

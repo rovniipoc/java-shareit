@@ -7,10 +7,6 @@ import lombok.Data;
 import ru.practicum.shareit.validation.CreateUserGroup;
 import ru.practicum.shareit.validation.UpdateUserGroup;
 
-/**
- * TODO Sprint add-controllers.
- */
-
 @Data
 public class User {
     @Positive

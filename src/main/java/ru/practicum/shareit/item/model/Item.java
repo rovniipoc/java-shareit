@@ -7,11 +7,6 @@ import lombok.Data;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.validation.CreateItemGroup;
 
-/**
- * TODO Sprint add-controllers.
- */
-
-
 @Data
 public class Item {
     @Positive

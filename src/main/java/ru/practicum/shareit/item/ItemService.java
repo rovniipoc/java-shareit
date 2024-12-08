@@ -2,6 +2,7 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -13,61 +14,66 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ItemService {
     private final ItemRepository itemRepository;
     private final UserService userService;
 
+
     public List<ItemDto> getAllByUserId(Long userId) {
-        return itemRepository.getAllByUserId(userId).stream().map(ItemMapper::toItemDto).toList();
+        return ItemMapper.toItemDto(itemRepository.findByOwner(userId));
     }
 
     public ItemDto getById(Long id) {
-        checkExistByItemId(id);
-        return ItemMapper.toItemDto(itemRepository.getById(id));
+        Item item = checkExistByItemId(id);
+        return ItemMapper.toItemDto(item);
     }
 
-    public List<ItemDto> getAllAvailableByParam(String text) {
+    // поиск Item с available = true по тексту, который содержится в name или description
+    public List<ItemDto> findByText(String text) {
         if (text.isBlank()) {
             return List.of();
         }
-        return itemRepository.getAllAvailableByParam(text).stream().map(ItemMapper::toItemDto).toList();
+        return ItemMapper.toItemDto(itemRepository.findByText(text));
     }
 
+    @Transactional
     public ItemDto create(Long userId, ItemDto itemDto) {
         Item item = ItemMapper.toItem(itemDto);
         checkExistUserById(userId);
         item.setOwner(userId);
-        return ItemMapper.toItemDto(itemRepository.create(item));
+        return ItemMapper.toItemDto(itemRepository.save(item));
     }
 
+    @Transactional
     public Item update(Long userId, Long itemId, Item item) {
-        checkExistByItemId(itemId);
+        Item existingItem = checkExistByItemId(itemId);
         checkExistUserById(userId);
-        Item currentItem = itemRepository.getById(itemId);
-        checkUserOwner(userId, currentItem);
+        checkUserOwner(userId, existingItem);
         item.setId(itemId);
 
         if (item.getName() == null || item.getName().isBlank()) {
-            item.setName(currentItem.getName());
+            item.setName(existingItem.getName());
         }
         if (item.getDescription() == null || item.getDescription().isBlank()) {
-            item.setDescription(currentItem.getDescription());
+            item.setDescription(existingItem.getDescription());
         }
         if (item.getAvailable() == null) {
-            item.setAvailable(currentItem.getAvailable());
+            item.setAvailable(existingItem.getAvailable());
         }
-        return itemRepository.update(item);
+        return itemRepository.save(item);
     }
 
+    @Transactional
     public void deleteById(Long userId, Long itemId) {
-        checkUserOwner(userId, itemRepository.getById(itemId));
+        Item item = checkExistByItemId(itemId);
+        checkUserOwner(userId, item);
         itemRepository.deleteById(itemId);
     }
 
-    private void checkExistByItemId(Long id) {
-        if (itemRepository.getById(id) == null) {
-            throw new NotFoundException("Вещь с id = " + id + " не существует");
-        }
+    private Item checkExistByItemId(Long id) {
+        return itemRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Вещь с id = " + id + " не существует"));
     }
 
     private void checkExistUserById(Long id) {

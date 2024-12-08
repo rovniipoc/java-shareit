@@ -1,5 +1,6 @@
 package ru.practicum.shareit.request;
 
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -7,18 +8,22 @@ import lombok.Data;
 
 import java.time.Instant;
 
-/**
- * TODO Sprint add-item-requests.
- */
-
 @Data
+@Entity
+@Table(name = "request", schema = "public")
 public class ItemRequest {
-    @Positive
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "description")
     @NotBlank
     private String description;
-    @Positive
+
+    @Column(name = "requestor")
     private Long requestor;
+
+    @Column(name = "created")
     @NotNull
     private Instant created;
 }

@@ -1,6 +1,11 @@
 package ru.practicum.shareit.item.dto;
 
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.dto.UserDto;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ItemMapper {
     public static ItemDto toItemDto(Item item) {
@@ -12,6 +17,16 @@ public class ItemMapper {
         itemDto.setOwner(item.getOwner());
         itemDto.setRequest(item.getRequest());
         return itemDto;
+    }
+
+    public static List<ItemDto> toItemDto(Iterable<Item> items) {
+        List<ItemDto> result = new ArrayList<>();
+
+        for (Item item : items) {
+            result.add(toItemDto(item));
+        }
+
+        return result;
     }
 
     public static Item toItem(ItemDto itemDto) {

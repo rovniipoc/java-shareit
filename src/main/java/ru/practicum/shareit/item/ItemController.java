@@ -40,7 +40,7 @@ public class ItemController {
     public List<ItemDto> getAllByParam(@RequestHeader("X-Sharer-User-Id") Long userId,
                                        @RequestParam String text) {
         log.info("Поступил запрос Get /items/search?text={} от пользователя с id = {} на получение Item с text {}", text, userId, text);
-        List<ItemDto> itemsDto = itemService.getAllAvailableByParam(text);
+        List<ItemDto> itemsDto = itemService.findByText(text);
         log.info("Сформирован ответ Get /items/search?text={} с телом: {}", text, itemsDto);
         return itemsDto;
     }

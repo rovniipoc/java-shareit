@@ -7,6 +7,8 @@ import lombok.Data;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.validation.CreateItemGroup;
 
+import java.time.LocalDateTime;
+
 @Data
 public class ItemDto {
     @Positive
@@ -19,4 +21,6 @@ public class ItemDto {
     private Boolean available;
     private Long owner;
     private ItemRequest request;
+    private LocalDateTime start;
+    private LocalDateTime end;
 }

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -15,8 +16,8 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.UserService;
-import ru.practicum.shareit.user.dto.UserMapper;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -32,6 +33,34 @@ public class BookingService {
     public List<BookingDto> getAll() {
         List<Booking> bookings = bookingRepository.findAll();
         return BookingMapper.toBookingDto(bookings);
+    }
+
+    public List<Booking> getAllUsersBookingByStatus(Long userId, StatusForBookingSearch statusForBookingSearch) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "start");
+
+        switch (statusForBookingSearch) {
+            case ALL -> {
+                return bookingRepository.findByBookerId(userId, sort);
+            }
+            case CURRENT -> {
+                return bookingRepository.findByBookerIdAndStartIsBeforeAndEndIsAfter(userId, LocalDateTime.now(), LocalDateTime.now(), sort);
+            }
+            case PAST -> {
+                return bookingRepository.findByBookerIdAndEndIsBefore(userId, LocalDateTime.now(), sort);
+            }
+            case FUTURE -> {
+                return bookingRepository.findByBookerIdAndStartIsAfter(userId, LocalDateTime.now(), sort);
+            }
+            case WAITING -> {
+                return bookingRepository.findByBookerIdAndStatus(userId, Status.WAITING, sort);
+            }
+            case REJECTED -> {
+                return bookingRepository.findByBookerIdAndStatus(userId, Status.REJECTED, sort);
+            }
+            default -> {
+                return List.of();
+            }
+        }
     }
 
     public Booking getById(Long bookingId, Long userId) {
@@ -88,7 +117,7 @@ public class BookingService {
 
     private void checkUserAccessForBooking(Booking booking, Long userId) {
         Long ownerId = itemService.getById(booking.getId()).getOwner();
-        if (!booking.getBooker().equals(userId) && !ownerId.equals(userId)) {
+        if (!booking.getBooker().getId().equals(userId) && !ownerId.equals(userId)) {
             throw new ValidationException("Данные о бронировании с id = " + booking.getId() + " доступны только заказчику и владельцу");
         }
     }

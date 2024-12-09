@@ -44,13 +44,6 @@ public class ItemMapper {
         return itemDto;
     }
 
-    public static List<ItemDto> toOwnerItemDto(Iterable<Item> items, Iterable<Booking> bookings) {
-        List<ItemDto> result = toItemDto(items);
-        //TODO ????
-
-        return result;
-    }
-
     public static Item toItem(ItemDto itemDto) {
         Item item = new Item();
         item.setId(itemDto.getId());

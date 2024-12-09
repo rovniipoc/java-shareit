@@ -20,7 +20,7 @@ public class Booking {
 
     @Column(name = "start_date")
     @NotNull
-    private LocalDateTime start = LocalDateTime.now();
+    private LocalDateTime start;
 
     @Column(name = "end_date")
     @NotNull

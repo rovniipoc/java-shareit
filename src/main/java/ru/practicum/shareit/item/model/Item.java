@@ -3,10 +3,9 @@ package ru.practicum.shareit.item.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import ru.practicum.shareit.request.ItemRequest;
-import ru.practicum.shareit.validation.CreateItemGroup;
+import ru.practicum.shareit.validation.CreateGroup;
 
 @Entity
 @Table(name = "item", schema = "public")
@@ -17,18 +16,19 @@ public class Item {
     private Long id;
 
     @Column(name = "name")
-    @NotBlank(groups = CreateItemGroup.class)
+    @NotBlank(groups = CreateGroup.class)
     private String name;
 
     @Column(name = "description")
-    @NotBlank(groups = CreateItemGroup.class)
+    @NotBlank(groups = CreateGroup.class)
     private String description;
 
     @Column(name = "available")
-    @NotNull(groups = CreateItemGroup.class)
+    @NotNull(groups = CreateGroup.class)
     private Boolean available;
 
     @Column(name = "owner")
+    @NotNull(groups = CreateGroup.class)
     private Long owner;
 
     @OneToOne

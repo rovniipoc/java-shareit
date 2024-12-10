@@ -3,10 +3,10 @@ package ru.practicum.shareit.booking;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.validation.CreateGroup;
 
 import java.time.LocalDateTime;
 
@@ -19,12 +19,12 @@ public class Booking {
     private Long id;
 
     @Column(name = "start_date")
-    @NotNull
+    @NotNull(groups = CreateGroup.class)
     private LocalDateTime start;
 
     @Column(name = "end_date")
-    @NotNull
-    @Future
+    @NotNull(groups = CreateGroup.class)
+    @Future(groups = CreateGroup.class)
     private LocalDateTime end;
 
     @OneToOne
@@ -36,6 +36,5 @@ public class Booking {
     private User booker;
 
     @Enumerated(EnumType.STRING)
-    @NotNull
     private Status status = Status.WAITING;
 }

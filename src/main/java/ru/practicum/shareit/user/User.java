@@ -3,12 +3,9 @@ package ru.practicum.shareit.user;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import ru.practicum.shareit.validation.CreateUserGroup;
-import ru.practicum.shareit.validation.UpdateUserGroup;
+import ru.practicum.shareit.validation.CreateGroup;
+import ru.practicum.shareit.validation.UpdateGroup;
 
 @Entity
 @Table(name = "users", schema = "public")
@@ -19,11 +16,11 @@ public class User {
     private Long id;
 
     @Column(name = "name")
-    @NotBlank(groups = CreateUserGroup.class)
+    @NotBlank(groups = CreateGroup.class)
     private String name;
 
     @Column(name = "email")
-    @Email(groups = {CreateUserGroup.class, UpdateUserGroup.class})
-    @NotBlank(groups = CreateUserGroup.class)
+    @Email(groups = {CreateGroup.class, UpdateGroup.class})
+    @NotBlank(groups = CreateGroup.class)
     private String email;
 }

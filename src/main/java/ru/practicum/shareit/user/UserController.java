@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.validation.CreateUserGroup;
-import ru.practicum.shareit.validation.UpdateUserGroup;
+import ru.practicum.shareit.validation.CreateGroup;
+import ru.practicum.shareit.validation.UpdateGroup;
 
 import java.util.List;
 
@@ -35,7 +35,7 @@ public class UserController {
     }
 
     @PostMapping
-    public UserDto create(@Validated(CreateUserGroup.class) @RequestBody User user) {
+    public UserDto create(@Validated(CreateGroup.class) @RequestBody User user) {
         log.info("Поступил запрос Post /users на создание User с телом {}", user);
         UserDto newUserDto = userService.create(user);
         log.info("Сформирован ответ Post /users с телом: {}", newUserDto);
@@ -44,7 +44,7 @@ public class UserController {
 
     @PatchMapping("/{id}")
     public UserDto update(@PathVariable Long id,
-                       @Validated(UpdateUserGroup.class) @RequestBody User user) {
+                       @Validated(UpdateGroup.class) @RequestBody User user) {
         log.info("Поступил запрос Patch /users/{} на обновление User с id = {} с телом {}", id, id, user);
         UserDto updatedUserDto = userService.update(id, user);
         log.info("Сформирован ответ Patch /users/{} с телом: {}", id, updatedUserDto);

@@ -41,9 +41,10 @@ CREATE TABLE IF NOT EXISTS booking
 CREATE TABLE IF NOT EXISTS comment
 (
     id        BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    text      VARCHAR(1000) NOT NULL,
-    item_id   BIGINT        NOT NULL,
-    author_id BIGINT        NOT NULL,
+    text      VARCHAR(1000)               NOT NULL,
+    item_id   BIGINT                      NOT NULL,
+    author_id BIGINT                      NOT NULL,
+    created   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     CONSTRAINT fk_comment_to_item FOREIGN KEY (item_id) REFERENCES item (id),
     CONSTRAINT fk_comment_to_user FOREIGN KEY (author_id) REFERENCES users (id)
 );

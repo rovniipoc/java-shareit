@@ -4,23 +4,26 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
+import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.request.ItemRequest;
-import ru.practicum.shareit.validation.CreateItemGroup;
+import ru.practicum.shareit.validation.CreateGroup;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class ItemDto {
     @Positive
     private Long id;
-    @NotBlank(groups = CreateItemGroup.class)
+    @NotBlank(groups = CreateGroup.class)
     private String name;
-    @NotBlank(groups = CreateItemGroup.class)
+    @NotBlank(groups = CreateGroup.class)
     private String description;
-    @NotNull(groups = CreateItemGroup.class)
+    @NotNull(groups = CreateGroup.class)
     private Boolean available;
     private Long owner;
     private ItemRequest request;
-    private LocalDateTime start;
-    private LocalDateTime end;
+    private Booking lastBooking;
+    private Booking nextBooking;
+    private List<Comment> comments;
 }

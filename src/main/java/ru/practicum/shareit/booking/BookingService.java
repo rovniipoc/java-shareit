@@ -10,12 +10,9 @@ import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.ItemRepository;
-import ru.practicum.shareit.item.ItemService;
-import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
-import ru.practicum.shareit.user.UserService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,14 +24,13 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
-    private final ItemService itemService;
-    private final UserService userService;
 
     public List<BookingDto> getAll() {
         List<Booking> bookings = bookingRepository.findAll();
         return BookingMapper.toBookingDto(bookings);
     }
 
+    // получение списка всех бронирований текущего пользователя
     public List<Booking> getAllUsersBookingByStatus(Long userId, StatusForBookingSearch statusForBookingSearch) {
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
 
@@ -73,11 +69,40 @@ public class BookingService {
         return bookingRepository.findByItemId(itemId);
     }
 
+    // получение списка бронирований для всех вещей текущего пользователя
+    public List<Booking> getAllBookingForUserItemsByStatus(Long userId, StatusForBookingSearch statusForBookingSearch) {
+        checkUserHaveItems(userId);
+        Sort sort = Sort.by(Sort.Direction.DESC, "start");
+
+        switch (statusForBookingSearch) {
+            case ALL -> {
+                return bookingRepository.findByItemOwner(userId, sort);
+            }
+            case CURRENT -> {
+                return bookingRepository.findByItemOwnerAndStartIsBeforeAndEndIsAfter(userId, LocalDateTime.now(), LocalDateTime.now(), sort);
+            }
+            case PAST -> {
+                return bookingRepository.findByItemOwnerAndEndIsBefore(userId, LocalDateTime.now(), sort);
+            }
+            case FUTURE -> {
+                return bookingRepository.findByItemOwnerAndStartIsAfter(userId, LocalDateTime.now(), sort);
+            }
+            case WAITING -> {
+                return bookingRepository.findByItemOwnerAndStatus(userId, Status.WAITING, sort);
+            }
+            case REJECTED -> {
+                return bookingRepository.findByItemOwnerAndStatus(userId, Status.REJECTED, sort);
+            }
+            default -> {
+                return List.of();
+            }
+        }
+    }
+
     @Transactional
     public Booking create(BookingDto bookingDto, Long userId) {
         User user = checkExistUserById(userId);
-        Item item = checkExistByItemId(bookingDto.getItemId());
-        checkAvailableItemById(bookingDto.getItemId());
+        Item item = checkAvailableItemById(bookingDto.getItemId());
 
         Booking booking = BookingMapper.toBooking(bookingDto, user, item);
 
@@ -96,16 +121,16 @@ public class BookingService {
         return booking;
     }
 
-    private ItemDto checkAvailableItemById(Long itemId) {
-        ItemDto itemDto = itemService.getById(itemId);
-        if (!itemService.getById(itemId).getAvailable()) {
+    private Item checkAvailableItemById(Long itemId) {
+        Item item = checkExistByItemId(itemId);
+        if (!item.getAvailable()) {
             throw new ConflictException("Вещь с id = " + itemId + " не доступна к бронированию");
         }
-        return itemDto;
+        return item;
     }
 
     private void checkUserIsItemsOwner(Long userId, Long itemId) {
-        if (!itemService.getById(itemId).getOwner().equals(userId)) {
+        if (!checkExistByItemId(itemId).getOwner().equals(userId)) {
             throw new ConflictException("Вещь с id = " + itemId + " не принадлежит вам");
         }
     }
@@ -116,7 +141,7 @@ public class BookingService {
     }
 
     private void checkUserAccessForBooking(Booking booking, Long userId) {
-        Long ownerId = itemService.getById(booking.getId()).getOwner();
+        Long ownerId = checkExistByItemId(booking.getItem().getId()).getOwner();
         if (!booking.getBooker().getId().equals(userId) && !ownerId.equals(userId)) {
             throw new ValidationException("Данные о бронировании с id = " + booking.getId() + " доступны только заказчику и владельцу");
         }
@@ -130,5 +155,11 @@ public class BookingService {
     private Item checkExistByItemId(Long id) {
         return itemRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Вещь с id = " + id + " не существует"));
+    }
+
+    private void checkUserHaveItems(Long userId) {
+        if (itemRepository.findByOwner(userId).isEmpty()) {
+            throw new NotFoundException("У пользователя с id = " + userId + " нет вещей");
+        }
     }
 }

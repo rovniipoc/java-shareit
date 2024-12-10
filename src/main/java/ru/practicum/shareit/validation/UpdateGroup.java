@@ -1,4 +1,4 @@
 package ru.practicum.shareit.validation;
 
-public interface CreateUserGroup {
+public interface UpdateGroup {
 }

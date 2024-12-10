@@ -1,19 +1,26 @@
 package ru.practicum.shareit.user;
 
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
 import lombok.Data;
-import ru.practicum.shareit.validation.CreateUserGroup;
-import ru.practicum.shareit.validation.UpdateUserGroup;
+import ru.practicum.shareit.validation.CreateGroup;
+import ru.practicum.shareit.validation.UpdateGroup;
 
+@Entity
+@Table(name = "users", schema = "public")
 @Data
 public class User {
-    @Positive
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotBlank(groups = CreateUserGroup.class)
+
+    @Column(name = "name")
+    @NotBlank(groups = CreateGroup.class)
     private String name;
-    @Email(groups = {CreateUserGroup.class, UpdateUserGroup.class})
-    @NotBlank(groups = CreateUserGroup.class)
+
+    @Column(name = "email")
+    @Email(groups = {CreateGroup.class, UpdateGroup.class})
+    @NotBlank(groups = CreateGroup.class)
     private String email;
 }

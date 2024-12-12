@@ -4,7 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserInputDto;
+import ru.practicum.shareit.user.dto.UserOutputDto;
 import ru.practicum.shareit.validation.CreateGroup;
 import ru.practicum.shareit.validation.UpdateGroup;
 
@@ -19,36 +20,36 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public List<UserDto> getAllUsers() {
+    public List<UserOutputDto> getAllUsers() {
         log.info("Поступил запрос Get /users на получение всех User");
-        List<UserDto> users = userService.getAll();
+        List<UserOutputDto> users = userService.getAll();
         log.info("Сформирован ответ Get /users с телом: {}", users);
         return users;
     }
 
     @GetMapping("/{id}")
-    public UserDto getUserById(@PathVariable Long id) {
+    public UserOutputDto getUserById(@PathVariable Long id) {
         log.info("Поступил запрос Get /users/{} на получение User с id = {}", id, id);
-        UserDto userDto = userService.getById(id);
-        log.info("Сформирован ответ Get /users/{} с телом: {}", id, userDto);
-        return userDto;
+        UserOutputDto userOutputDto = userService.getById(id);
+        log.info("Сформирован ответ Get /users/{} с телом: {}", id, userOutputDto);
+        return userOutputDto;
     }
 
     @PostMapping
-    public UserDto create(@Validated(CreateGroup.class) @RequestBody User user) {
-        log.info("Поступил запрос Post /users на создание User с телом {}", user);
-        UserDto newUserDto = userService.create(user);
-        log.info("Сформирован ответ Post /users с телом: {}", newUserDto);
-        return newUserDto;
+    public UserOutputDto create(@Validated(CreateGroup.class) @RequestBody UserInputDto userInputDto) {
+        log.info("Поступил запрос Post /users на создание User с телом {}", userInputDto);
+        UserOutputDto newUserOutputDto = userService.create(userInputDto);
+        log.info("Сформирован ответ Post /users с телом: {}", newUserOutputDto);
+        return newUserOutputDto;
     }
 
     @PatchMapping("/{id}")
-    public UserDto update(@PathVariable Long id,
-                       @Validated(UpdateGroup.class) @RequestBody User user) {
-        log.info("Поступил запрос Patch /users/{} на обновление User с id = {} с телом {}", id, id, user);
-        UserDto updatedUserDto = userService.update(id, user);
-        log.info("Сформирован ответ Patch /users/{} с телом: {}", id, updatedUserDto);
-        return updatedUserDto;
+    public UserOutputDto update(@PathVariable Long id,
+                                @Validated(UpdateGroup.class) @RequestBody UserInputDto userInputDto) {
+        log.info("Поступил запрос Patch /users/{} на обновление User с id = {} с телом {}", id, id, userInputDto);
+        UserOutputDto updatedUserOutputDto = userService.update(id, userInputDto);
+        log.info("Сформирован ответ Patch /users/{} с телом: {}", id, updatedUserOutputDto);
+        return updatedUserOutputDto;
     }
 
     @DeleteMapping("/{id}")

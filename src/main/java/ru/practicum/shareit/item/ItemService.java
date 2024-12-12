@@ -10,10 +10,7 @@ import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
-import ru.practicum.shareit.item.dto.CommentDto;
-import ru.practicum.shareit.item.dto.CommentMapper;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemMapper;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
@@ -32,58 +29,59 @@ public class ItemService {
     private final BookingRepository bookingRepository;
 
 
-    public List<ItemDto> getAllByUserId(Long userId) {
-        return ItemMapper.toItemDto(itemRepository.findByOwner(userId));
+    public List<ItemOutputDto> getAllByUserId(Long userId) {
+        return ItemMapper.toItemOutputDto(itemRepository.findByOwner(userId));
     }
 
-    public ItemDto getById(Long id) {
+    public ItemOutputDto getById(Long id) {
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
 
         Item item = checkExistByItemId(id);
         List<Booking> bookings = bookingRepository.findByItemIdAndStatus(id, Status.APPROVED, sort);
         List<Comment> comments = commentRepository.findByItemId(id);
-        return ItemMapper.toOwnerItemDto(item, bookings, comments);
+        return ItemMapper.toDetailedItemOutputDto(item, bookings, comments);
     }
 
     // поиск Item с available = true по тексту, который содержится в name или description
-    public List<ItemDto> findByText(String text) {
+    public List<ItemOutputDto> findByText(String text) {
         if (text.isBlank()) {
             return List.of();
         }
-        return ItemMapper.toItemDto(itemRepository.findByText(text));
+        return ItemMapper.toItemOutputDto(itemRepository.findByText(text));
     }
 
     @Transactional
-    public ItemDto create(Long userId, ItemDto itemDto) {
-        Item item = ItemMapper.toItem(itemDto);
+    public ItemOutputDto create(Long userId, ItemInputDto itemInputDto) {
+        Item item = ItemMapper.toItem(itemInputDto);
         checkExistUserById(userId);
         item.setOwner(userId);
-        return ItemMapper.toItemDto(itemRepository.save(item));
+        return ItemMapper.toItemOutputDto(itemRepository.save(item));
     }
 
     @Transactional
-    public Item update(Long userId, Long itemId, Item item) {
+    public ItemOutputDto update(Long userId, Long itemId, ItemInputDto itemInputDto) {
+        Item inputItem = ItemMapper.toItem(itemInputDto);
         Item existingItem = checkExistByItemId(itemId);
         checkExistUserById(userId);
         checkUserOwner(userId, existingItem);
-        item.setId(itemId);
+        inputItem.setId(itemId);
 
-        if (item.getName() == null || item.getName().isBlank()) {
-            item.setName(existingItem.getName());
+        if (inputItem.getName() == null || inputItem.getName().isBlank()) {
+            inputItem.setName(existingItem.getName());
         }
-        if (item.getDescription() == null || item.getDescription().isBlank()) {
-            item.setDescription(existingItem.getDescription());
+        if (inputItem.getDescription() == null || inputItem.getDescription().isBlank()) {
+            inputItem.setDescription(existingItem.getDescription());
         }
-        if (item.getAvailable() == null) {
-            item.setAvailable(existingItem.getAvailable());
+        if (inputItem.getAvailable() == null) {
+            inputItem.setAvailable(existingItem.getAvailable());
         }
-        if (item.getOwner() == null) {
-            item.setOwner(existingItem.getOwner());
+        if (inputItem.getOwner() == null) {
+            inputItem.setOwner(existingItem.getOwner());
         }
-        if (item.getRequest() == null) {
-            item.setRequest(existingItem.getRequest());
+        if (inputItem.getRequest() == null) {
+            inputItem.setRequest(existingItem.getRequest());
         }
-        return itemRepository.save(item);
+        return ItemMapper.toItemOutputDto(itemRepository.save(inputItem));
     }
 
     @Transactional
@@ -94,13 +92,14 @@ public class ItemService {
     }
 
     @Transactional
-    public CommentDto createComment(Long userId, Long itemId, Comment comment) {
+    public CommentOutputDto createComment(Long userId, Long itemId, CommentInputDto commentInputDto) {
         User user = checkExistUserById(userId);
         Item item = checkExistByItemId(itemId);
         checkUserBookingItem(userId, itemId);
+        Comment comment = CommentMapper.toComment(commentInputDto);
         comment.setAuthor(user);
         comment.setItem(item);
-        return CommentMapper.toCommentDto(commentRepository.save(comment));
+        return CommentMapper.toCommentOutputDto(commentRepository.save(comment));
     }
 
     private Item checkExistByItemId(Long id) {

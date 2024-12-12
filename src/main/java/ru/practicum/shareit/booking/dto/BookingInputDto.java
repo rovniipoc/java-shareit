@@ -8,9 +8,7 @@ import ru.practicum.shareit.validation.CreateGroup;
 import java.time.LocalDateTime;
 
 @Data
-public class BookingDto {
-
-    private Long id;
+public class BookingInputDto {
 
     @NotNull(groups = CreateGroup.class)
     @Future(groups = CreateGroup.class)

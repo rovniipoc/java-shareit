@@ -12,7 +12,7 @@ import ru.practicum.shareit.validation.CreateGroup;
 import java.util.List;
 
 @Data
-public class ItemDto {
+public class ItemOutputDto {
     @Positive
     private Long id;
     @NotBlank(groups = CreateGroup.class)

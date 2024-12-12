@@ -5,7 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
-import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserInputDto;
+import ru.practicum.shareit.user.dto.UserOutputDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 
 import java.util.List;
@@ -16,24 +17,26 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
 
-    public List<UserDto> getAll() {
+    public List<UserOutputDto> getAll() {
         List<User> users = userRepository.findAll();
-        return UserMapper.toUserDto(users);
+        return UserMapper.toUserOutputDto(users);
     }
 
-    public UserDto getById(Long id) {
+    public UserOutputDto getById(Long id) {
         User user = checkExistByUserId(id);
-        return UserMapper.toUserDto(user);
+        return UserMapper.toUserOutputDto(user);
     }
 
     @Transactional
-    public UserDto create(User user) {
+    public UserOutputDto create(UserInputDto userInputDto) {
+        User user = UserMapper.toUser(userInputDto);
         checkDuplicateUserByEmail(user);
-        return UserMapper.toUserDto(userRepository.save(user));
+        return UserMapper.toUserOutputDto(userRepository.save(user));
     }
 
     @Transactional
-    public UserDto update(Long id, User user) {
+    public UserOutputDto update(Long id, UserInputDto userInputDto) {
+        User user = UserMapper.toUser(userInputDto);
         User existingUser = checkExistByUserId(id);
         user.setId(id);
 
@@ -45,7 +48,7 @@ public class UserService {
             user.setEmail(existingUser.getEmail());
         }
 
-        return UserMapper.toUserDto(userRepository.save(user));
+        return UserMapper.toUserOutputDto(userRepository.save(user));
     }
 
     @Transactional

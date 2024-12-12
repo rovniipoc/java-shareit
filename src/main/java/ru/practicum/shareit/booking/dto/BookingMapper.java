@@ -8,33 +8,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BookingMapper {
-    public static BookingDto toBookingDto(Booking booking) {
-        BookingDto bookingDto = new BookingDto();
-        bookingDto.setId(booking.getId());
-        bookingDto.setStart(booking.getStart());
-        bookingDto.setEnd(booking.getEnd());
-        bookingDto.setItemId(booking.getItem().getId());
-        bookingDto.setBooker(booking.getBooker().getId());
-        bookingDto.setStatus(booking.getStatus());
+    public static BookingOutputDto toBookingOutputDto(Booking booking) {
+        BookingOutputDto bookingOutputDto = new BookingOutputDto();
+        bookingOutputDto.setId(booking.getId());
+        bookingOutputDto.setStart(booking.getStart());
+        bookingOutputDto.setEnd(booking.getEnd());
+        bookingOutputDto.setItem(booking.getItem());
+        bookingOutputDto.setBooker(booking.getBooker());
+        bookingOutputDto.setStatus(booking.getStatus());
 
-        return bookingDto;
+        return bookingOutputDto;
     }
 
-    public static List<BookingDto> toBookingDto(Iterable<Booking> bookings) {
-        List<BookingDto> result = new ArrayList<>();
+    public static List<BookingOutputDto> toBookingOutputDto(Iterable<Booking> bookings) {
+        List<BookingOutputDto> result = new ArrayList<>();
 
         for (Booking booking : bookings) {
-            result.add(toBookingDto(booking));
+            result.add(toBookingOutputDto(booking));
         }
 
         return result;
     }
 
-    public static Booking toBooking(BookingDto bookingDto, User user, Item item) {
+    public static Booking toBooking(BookingInputDto bookingInputDto, User user, Item item) {
         Booking booking = new Booking();
-        booking.setId(bookingDto.getId());
-        booking.setStart(bookingDto.getStart());
-        booking.setEnd(bookingDto.getEnd());
+        booking.setStart(bookingInputDto.getStart());
+        booking.setEnd(bookingInputDto.getEnd());
         booking.setItem(item);
         booking.setBooker(user);
 

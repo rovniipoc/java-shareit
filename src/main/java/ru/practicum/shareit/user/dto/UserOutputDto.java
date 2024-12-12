@@ -8,7 +8,7 @@ import ru.practicum.shareit.validation.CreateGroup;
 import ru.practicum.shareit.validation.UpdateGroup;
 
 @Data
-public class UserDto {
+public class UserOutputDto {
     @Positive
     private Long id;
     @NotBlank(groups = CreateGroup.class)

@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.dto;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.dto.ItemRequestMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,9 @@ public class ItemMapper {
         itemOutputDto.setDescription(item.getDescription());
         itemOutputDto.setAvailable(item.getAvailable());
         itemOutputDto.setOwner(item.getOwner());
-        itemOutputDto.setRequest(item.getRequest());
+        if (item.getRequest() != null){
+            itemOutputDto.setRequest(ItemRequestMapper.toItemRequestOutputDto(item.getRequest()));
+        }
         return itemOutputDto;
     }
 
@@ -34,8 +37,15 @@ public class ItemMapper {
         itemOutputDto.setDescription(item.getDescription());
         itemOutputDto.setAvailable(item.getAvailable());
         itemOutputDto.setOwner(item.getOwner());
-        itemOutputDto.setRequest(item.getRequest());
-        itemOutputDto.setComments(comments);
+        if (item.getRequest() != null){
+            itemOutputDto.setRequest(ItemRequestMapper.toItemRequestOutputDto(item.getRequest()));
+        }
+
+        List<CommentOutputDto> commentsDto = comments.stream()
+                .map(CommentMapper::toCommentOutputDto)
+                .toList();
+        itemOutputDto.setComments(commentsDto);
+
         return itemOutputDto;
     }
 

@@ -13,6 +13,8 @@ import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.request.ItemRequestRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
@@ -27,6 +29,7 @@ public class ItemService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
 
     public List<ItemOutputDto> getAllByUserId(Long userId) {
@@ -53,6 +56,10 @@ public class ItemService {
     @Transactional
     public ItemOutputDto create(Long userId, ItemInputDto itemInputDto) {
         Item item = ItemMapper.toItem(itemInputDto);
+        if (itemInputDto.getRequestId() != null) {
+            ItemRequest itemRequest = checkExistItemRequestById(itemInputDto.getRequestId());
+            item.setRequest(itemRequest);
+        }
         checkExistUserById(userId);
         item.setOwner(userId);
         return ItemMapper.toItemOutputDto(itemRepository.save(item));
@@ -61,6 +68,10 @@ public class ItemService {
     @Transactional
     public ItemOutputDto update(Long userId, Long itemId, ItemInputDto itemInputDto) {
         Item inputItem = ItemMapper.toItem(itemInputDto);
+        if (itemInputDto.getRequestId() != null) {
+            ItemRequest itemRequest = checkExistItemRequestById(itemInputDto.getRequestId());
+            inputItem.setRequest(itemRequest);
+        }
         Item existingItem = checkExistByItemId(itemId);
         checkExistUserById(userId);
         checkUserOwner(userId, existingItem);
@@ -77,6 +88,9 @@ public class ItemService {
         }
         if (inputItem.getOwner() == null) {
             inputItem.setOwner(existingItem.getOwner());
+        }
+        if (inputItem.getRequest() == null) {
+            inputItem.setRequest(existingItem.getRequest());
         }
         if (inputItem.getRequest() == null) {
             inputItem.setRequest(existingItem.getRequest());
@@ -110,6 +124,11 @@ public class ItemService {
     private User checkExistUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id = " + id + " не существует"));
+    }
+
+    private ItemRequest checkExistItemRequestById(Long id) {
+        return itemRequestRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Запрос с id = " + id + " не существует"));
     }
 
     private void checkUserOwner(Long userId, Item item) {

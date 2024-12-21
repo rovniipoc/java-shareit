@@ -8,5 +8,5 @@ import java.util.List;
 @Getter
 @RequiredArgsConstructor
 public class ErrorResponse {
-    private final List<Violation> violations;
+    private final List<Violation> error;
 }

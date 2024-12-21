@@ -4,8 +4,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import ru.practicum.shareit.user.User;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -19,10 +20,11 @@ public class ItemRequest {
     @NotBlank
     private String description;
 
-    @Column(name = "requestor")
-    private Long requestor;
+    @ManyToOne
+    @JoinColumn(name = "requestor")
+    private User requestor;
 
     @Column(name = "created")
     @NotNull
-    private Instant created;
+    private LocalDateTime created = LocalDateTime.now();
 }

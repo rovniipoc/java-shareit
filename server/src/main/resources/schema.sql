@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS request
     description VARCHAR(1000)               NOT NULL,
     requestor   BIGINT                      NOT NULL,
     created     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    CONSTRAINT fk_request_to_user FOREIGN KEY (requestor) REFERENCES users (id)
+    CONSTRAINT fk_request_to_user FOREIGN KEY (requestor) REFERENCES users (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS item
@@ -22,8 +22,8 @@ CREATE TABLE IF NOT EXISTS item
     available   BOOLEAN       NOT NULL,
     owner       BIGINT,
     request_id  BIGINT,
-    CONSTRAINT fk_item_to_user FOREIGN KEY (owner) REFERENCES users (id),
-    CONSTRAINT fk_item_to_request FOREIGN KEY (request_id) REFERENCES request (id)
+    CONSTRAINT fk_item_to_user FOREIGN KEY (owner) REFERENCES users (id) ON DELETE CASCADE,
+    CONSTRAINT fk_item_to_request FOREIGN KEY (request_id) REFERENCES request (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS booking
@@ -34,8 +34,8 @@ CREATE TABLE IF NOT EXISTS booking
     item_id    BIGINT                      NOT NULL,
     booker_id  BIGINT                      NOT NULL,
     status     VARCHAR(255)                NOT NULL,
-    CONSTRAINT fk_booking_to_item FOREIGN KEY (item_id) REFERENCES item (id),
-    CONSTRAINT fk_booking_to_user FOREIGN KEY (booker_id) REFERENCES users (id)
+    CONSTRAINT fk_booking_to_item FOREIGN KEY (item_id) REFERENCES item (id) ON DELETE CASCADE,
+    CONSTRAINT fk_booking_to_user FOREIGN KEY (booker_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS comment
@@ -45,6 +45,6 @@ CREATE TABLE IF NOT EXISTS comment
     item_id   BIGINT                      NOT NULL,
     author_id BIGINT                      NOT NULL,
     created   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    CONSTRAINT fk_comment_to_item FOREIGN KEY (item_id) REFERENCES item (id),
-    CONSTRAINT fk_comment_to_user FOREIGN KEY (author_id) REFERENCES users (id)
+    CONSTRAINT fk_comment_to_item FOREIGN KEY (item_id) REFERENCES item (id) ON DELETE CASCADE,
+    CONSTRAINT fk_comment_to_user FOREIGN KEY (author_id) REFERENCES users (id) ON DELETE CASCADE
 );

@@ -12,7 +12,6 @@ public class BookingInputDto {
 
     @NotNull(groups = CreateGroup.class)
     @Future(groups = CreateGroup.class)
-    //private LocalDateTime start = LocalDateTime.now();
     private LocalDateTime start;
 
     @NotNull(groups = CreateGroup.class)

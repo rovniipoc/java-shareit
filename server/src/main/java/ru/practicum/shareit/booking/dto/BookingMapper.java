@@ -11,7 +11,7 @@ import java.util.List;
 
 public class BookingMapper {
     public static BookingOutputDto toBookingOutputDto(Booking booking) {
-        BookingOutputDto bookingOutputDto = new BookingOutputDto();
+        BookingOutputDto bookingOutputDto = BookingOutputDto.builder().build();
         bookingOutputDto.setId(booking.getId());
         bookingOutputDto.setStart(booking.getStart());
         bookingOutputDto.setEnd(booking.getEnd());

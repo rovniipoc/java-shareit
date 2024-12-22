@@ -10,7 +10,7 @@ import java.util.List;
 
 public class ItemMapper {
     public static ItemOutputDto toItemOutputDto(Item item) {
-        ItemOutputDto itemOutputDto = new ItemOutputDto();
+        ItemOutputDto itemOutputDto = ItemOutputDto.builder().build();
         itemOutputDto.setId(item.getId());
         itemOutputDto.setName(item.getName());
         itemOutputDto.setDescription(item.getDescription());
@@ -31,7 +31,7 @@ public class ItemMapper {
     }
 
     public static ItemOutputDto toDetailedItemOutputDto(Item item, List<Booking> bookings, List<Comment> comments) {
-        ItemOutputDto itemOutputDto = new ItemOutputDto();
+        ItemOutputDto itemOutputDto = ItemOutputDto.builder().build();
         itemOutputDto.setId(item.getId());
         itemOutputDto.setName(item.getName());
         itemOutputDto.setDescription(item.getDescription());

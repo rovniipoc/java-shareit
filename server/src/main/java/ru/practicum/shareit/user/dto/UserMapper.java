@@ -7,7 +7,7 @@ import java.util.List;
 
 public class UserMapper {
     public static UserOutputDto toUserOutputDto(User user) {
-        UserOutputDto userOutputDto = new UserOutputDto();
+        UserOutputDto userOutputDto = UserOutputDto.builder().build();
         userOutputDto.setId(user.getId());
         userOutputDto.setName(user.getName());
         userOutputDto.setEmail(user.getEmail());

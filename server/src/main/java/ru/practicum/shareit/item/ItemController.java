@@ -8,8 +8,6 @@ import ru.practicum.shareit.item.dto.CommentInputDto;
 import ru.practicum.shareit.item.dto.CommentOutputDto;
 import ru.practicum.shareit.item.dto.ItemInputDto;
 import ru.practicum.shareit.item.dto.ItemOutputDto;
-import ru.practicum.shareit.validation.CreateGroup;
-import ru.practicum.shareit.validation.UpdateGroup;
 
 import java.util.List;
 
@@ -50,7 +48,7 @@ public class ItemController {
 
     @PostMapping
     public ItemOutputDto create(@RequestHeader(USER_ID_HEADER) Long userId,
-                                @Validated(CreateGroup.class) @RequestBody ItemInputDto itemInputDto) {
+                                @RequestBody ItemInputDto itemInputDto) {
         log.info("Поступил запрос Post /items от пользователя с id = {} на добавление Item с телом {}", userId, itemInputDto);
         ItemOutputDto newItemOutputDto = itemService.create(userId, itemInputDto);
         log.info("Сформирован ответ Post /items с телом: {}", newItemOutputDto);
@@ -59,8 +57,8 @@ public class ItemController {
 
     @PatchMapping("/{itemId}")
     public ItemOutputDto update(@RequestHeader(USER_ID_HEADER) Long userId,
-                       @Validated(UpdateGroup.class) @RequestBody ItemInputDto itemInputDto,
-                       @PathVariable Long itemId) {
+                                @RequestBody ItemInputDto itemInputDto,
+                                @PathVariable Long itemId) {
         log.info("Поступил запрос Patch /items/{} от пользователя с id = {} на изменение Item с id = {} с телом {}", itemId, userId, itemId, itemInputDto);
         ItemOutputDto updatedItem = itemService.update(userId, itemId, itemInputDto);
         log.info("Сформирован ответ Patch /items/{} с телом: {}", itemId, updatedItem);
@@ -69,7 +67,7 @@ public class ItemController {
 
     @PostMapping("/{itemId}/comment")
     public CommentOutputDto create(@RequestHeader(USER_ID_HEADER) Long userId,
-                                   @Validated(CreateGroup.class) @RequestBody CommentInputDto commentInputDto,
+                                   @RequestBody CommentInputDto commentInputDto,
                                    @PathVariable Long itemId) {
         log.info("Поступил запрос Post /items/{}/comment от пользователя с id = {} на создание Comment для Item с id = {} с телом {}", itemId, userId, itemId, commentInputDto);
         CommentOutputDto newCommentOutputDto = itemService.createComment(userId, itemId, commentInputDto);

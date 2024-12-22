@@ -20,7 +20,6 @@ public class ItemRequest {
     private Long id;
 
     @Column(name = "description")
-    @NotBlank
     private String description;
 
     @ManyToOne
@@ -28,7 +27,6 @@ public class ItemRequest {
     private User requestor;
 
     @Column(name = "created")
-    @NotNull
     private LocalDateTime created = LocalDateTime.now();
 
     @OneToMany

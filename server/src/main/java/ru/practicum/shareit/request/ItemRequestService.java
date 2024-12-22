@@ -19,7 +19,6 @@ import java.util.List;
 public class ItemRequestService {
     private final ItemRequestRepository itemRequestRepository;
     private final UserRepository userRepository;
-    private final ItemRepository itemRepository;
 
     @Transactional
     public ItemRequestOutputDto create(ItemRequestInputDto itemRequestInputDto, Long userId) {

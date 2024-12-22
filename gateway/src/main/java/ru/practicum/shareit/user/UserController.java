@@ -10,8 +10,6 @@ import ru.practicum.shareit.user.dto.UserInputDto;
 import ru.practicum.shareit.validation.CreateGroup;
 import ru.practicum.shareit.validation.UpdateGroup;
 
-import java.util.List;
-
 
 @Slf4j
 @Controller

@@ -1,20 +1,5 @@
 package ru.practicum.shareit.booking;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
-import jakarta.validation.groups.Default;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import ru.practicum.shareit.booking.dto.BookingInputDto;
-import ru.practicum.shareit.validation.CreateGroup;
-
-import java.time.LocalDateTime;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BookingInputDtoTests {
 

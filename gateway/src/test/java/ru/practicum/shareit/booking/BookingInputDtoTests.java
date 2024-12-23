@@ -1,46 +1,203 @@
 package ru.practicum.shareit.booking;
 
-import org.junit.jupiter.api.BeforeEach;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+import jakarta.validation.groups.Default;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.json.JsonTest;
-import org.springframework.boot.test.json.JacksonTester;
+import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.booking.dto.BookingInputDto;
+import ru.practicum.shareit.validation.CreateGroup;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@JsonTest
+@SpringBootTest
 public class BookingInputDtoTests {
 
-    @Autowired
-    private JacksonTester<BookingInputDto> json;
+    private static Validator validator;
 
-    private static final String START = "2000-01-01T11:11:11";
-    private static final String END = "2111-01-01T11:11:11";
-
-    private BookingInputDto bookingInputDto = null;
-
-    @BeforeEach
-    public void setup() {
-        bookingInputDto = new BookingInputDto();
-        bookingInputDto.setStart(LocalDateTime.parse(START));
-        bookingInputDto.setEnd(LocalDateTime.parse(END));
+    @BeforeAll
+    public static void setUp() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
     }
 
     @Test
-    public void startSerializes() throws IOException {
-        assertThat(json.write(bookingInputDto))
-                .extractingJsonPathStringValue("$.start")
-                .isEqualTo(START);
+    void testValidBookingInputDto() {
+        BookingInputDto bookingInputDto = new BookingInputDto();
+        bookingInputDto.setStart(LocalDateTime.now().plusHours(1));
+        bookingInputDto.setEnd(LocalDateTime.now().plusHours(2));
+        bookingInputDto.setItemId(1L);
+
+        Set<ConstraintViolation<BookingInputDto>> violations = validator.validate(bookingInputDto, Default.class, CreateGroup.class);
+        assertTrue(violations.isEmpty());
     }
 
     @Test
-    public void endSerializes() throws IOException {
-        assertThat(json.write(bookingInputDto))
-                .extractingJsonPathStringValue("$.end")
-                .isEqualTo(END);
+    void testStartDateInThePast() {
+        BookingInputDto bookingInputDto = new BookingInputDto();
+        bookingInputDto.setStart(LocalDateTime.now().minusHours(1));
+        bookingInputDto.setEnd(LocalDateTime.now().plusHours(1));
+        bookingInputDto.setItemId(1L);
+
+        Set<ConstraintViolation<BookingInputDto>> violations = validator.validate(bookingInputDto, Default.class, CreateGroup.class);
+        assertEquals(1, violations.size());
+
+        boolean foundFutureOrPresentDateViolation = false;
+
+        for (ConstraintViolation<BookingInputDto> violation : violations) {
+            if ("должно содержать сегодняшнее число или дату, которая еще не наступила".equals(violation.getMessage())) {
+                foundFutureOrPresentDateViolation = true;
+            }
+        }
+
+        assertTrue(foundFutureOrPresentDateViolation, "Ожидалось нарушение валидации: должно содержать сегодняшнее число или дату, которая еще не наступила");
+    }
+
+    @Test
+    void testEndDateInThePast() {
+        BookingInputDto bookingInputDto = new BookingInputDto();
+        bookingInputDto.setStart(LocalDateTime.now().plusHours(1));
+        bookingInputDto.setEnd(LocalDateTime.now().minusHours(1));
+        bookingInputDto.setItemId(1L);
+
+        Set<ConstraintViolation<BookingInputDto>> violations = validator.validate(bookingInputDto, Default.class, CreateGroup.class);
+        assertEquals(2, violations.size());
+
+        boolean foundFutureDateViolation = false;
+        boolean foundStartBeforeEndViolation = false;
+
+        for (ConstraintViolation<BookingInputDto> violation : violations) {
+            if ("должно содержать дату, которая еще не наступила".equals(violation.getMessage())) {
+                foundFutureDateViolation = true;
+            }
+            if ("Время начала бронирования должно предшествовать времени его завершения".equals(violation.getMessage())) {
+                foundStartBeforeEndViolation = true;
+            }
+        }
+
+        assertTrue(foundFutureDateViolation, "Ожидалось нарушение валидации: должно содержать дату, которая еще не наступила");
+        assertTrue(foundStartBeforeEndViolation, "Ожидалось нарушение валидации: Время начала бронирования должно предшествовать времени его завершения");
+    }
+
+    @Test
+    void testStartDateAfterEndDate() {
+        BookingInputDto bookingInputDto = new BookingInputDto();
+        bookingInputDto.setStart(LocalDateTime.now().plusHours(2));
+        bookingInputDto.setEnd(LocalDateTime.now().plusHours(1));
+        bookingInputDto.setItemId(1L);
+
+        Set<ConstraintViolation<BookingInputDto>> violations = validator.validate(bookingInputDto, Default.class, CreateGroup.class);
+        assertEquals(1, violations.size());
+
+        boolean foundStartBeforeEndViolation = false;
+
+        for (ConstraintViolation<BookingInputDto> violation : violations) {
+            if ("Время начала бронирования должно предшествовать времени его завершения".equals(violation.getMessage())) {
+                foundStartBeforeEndViolation = true;
+            }
+        }
+
+        assertTrue(foundStartBeforeEndViolation, "Ожидалось нарушение валидации: Время начала бронирования должно предшествовать времени его завершения");
+    }
+
+    @Test
+    void testNullStartDate() {
+        BookingInputDto bookingInputDto = new BookingInputDto();
+        bookingInputDto.setStart(null);
+        bookingInputDto.setEnd(LocalDateTime.now().plusHours(1));
+        bookingInputDto.setItemId(1L);
+
+        Set<ConstraintViolation<BookingInputDto>> violations = validator.validate(bookingInputDto, Default.class, CreateGroup.class);
+        assertEquals(2, violations.size());
+
+        boolean foundNotNullViolation = false;
+        boolean foundStartBeforeEndViolation = false;
+
+        for (ConstraintViolation<BookingInputDto> violation : violations) {
+            if ("не должно равняться null".equals(violation.getMessage())) {
+                foundNotNullViolation = true;
+            }
+            if ("Время начала бронирования должно предшествовать времени его завершения".equals(violation.getMessage())) {
+                foundStartBeforeEndViolation = true;
+            }
+        }
+
+        assertTrue(foundStartBeforeEndViolation, "Ожидалось нарушение валидации: Время начала бронирования должно предшествовать времени его завершения");
+        assertTrue(foundNotNullViolation, "Ожидалось нарушение валидации: не должно равняться null");
+    }
+
+    @Test
+    void testNullEndDate() {
+        BookingInputDto bookingInputDto = new BookingInputDto();
+        bookingInputDto.setStart(LocalDateTime.now().plusHours(1));
+        bookingInputDto.setEnd(null);
+        bookingInputDto.setItemId(1L);
+
+        Set<ConstraintViolation<BookingInputDto>> violations = validator.validate(bookingInputDto, Default.class, CreateGroup.class);
+        assertEquals(2, violations.size());
+
+        boolean foundNotNullViolation = false;
+        boolean foundStartBeforeEndViolation = false;
+
+        for (ConstraintViolation<BookingInputDto> violation : violations) {
+            if ("не должно равняться null".equals(violation.getMessage())) {
+                foundNotNullViolation = true;
+            }
+            if ("Время начала бронирования должно предшествовать времени его завершения".equals(violation.getMessage())) {
+                foundStartBeforeEndViolation = true;
+            }
+        }
+
+        assertTrue(foundStartBeforeEndViolation, "Ожидалось нарушение валидации: Время начала бронирования должно предшествовать времени его завершения");
+        assertTrue(foundNotNullViolation, "Ожидалось нарушение валидации: не должно равняться null");
+    }
+
+    @Test
+    void testNullItemId() {
+        BookingInputDto bookingInputDto = new BookingInputDto();
+        bookingInputDto.setStart(LocalDateTime.now().plusHours(1));
+        bookingInputDto.setEnd(LocalDateTime.now().plusHours(2));
+        bookingInputDto.setItemId(0L);
+
+        Set<ConstraintViolation<BookingInputDto>> violations = validator.validate(bookingInputDto, Default.class, CreateGroup.class);
+        assertEquals(1, violations.size());
+
+        boolean foundPositiveViolation = false;
+
+        for (ConstraintViolation<BookingInputDto> violation : violations) {
+            if ("должно быть больше 0".equals(violation.getMessage())) {
+                foundPositiveViolation = true;
+            }
+        }
+
+        assertTrue(foundPositiveViolation, "Ожидалось нарушение валидации: должно быть больше 0");
+    }
+
+    @Test
+    void testNegativeItemId() {
+        BookingInputDto bookingInputDto = new BookingInputDto();
+        bookingInputDto.setStart(LocalDateTime.now().plusHours(1));
+        bookingInputDto.setEnd(LocalDateTime.now().plusHours(2));
+        bookingInputDto.setItemId(-1L);
+
+        Set<ConstraintViolation<BookingInputDto>> violations = validator.validate(bookingInputDto, Default.class, CreateGroup.class);
+        assertEquals(1, violations.size());
+
+        boolean foundPositiveViolation = false;
+
+        for (ConstraintViolation<BookingInputDto> violation : violations) {
+            if ("должно быть больше 0".equals(violation.getMessage())) {
+                foundPositiveViolation = true;
+            }
+        }
+
+        assertTrue(foundPositiveViolation, "Ожидалось нарушение валидации: должно быть больше 0");
     }
 }

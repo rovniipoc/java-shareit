@@ -151,6 +151,32 @@ public class ItemServiceTests {
     }
 
     @Test
+    void testUpdateItemWithoutName() {
+        ItemInputDto updatedItemInputDto = new ItemInputDto();
+        updatedItemInputDto.setDescription("Updated Test Description");
+        updatedItemInputDto.setAvailable(false);
+
+        ItemOutputDto updatedItemOutputDto = itemService.update(userId, itemId, updatedItemInputDto);
+        assertNotNull(updatedItemOutputDto);
+        assertEquals(itemInputDto.getName(), updatedItemOutputDto.getName());
+        assertEquals(updatedItemInputDto.getDescription(), updatedItemOutputDto.getDescription());
+        assertEquals(updatedItemInputDto.getAvailable(), updatedItemOutputDto.getAvailable());
+    }
+
+    @Test
+    void testUpdateItemWithoutDescription() {
+        ItemInputDto updatedItemInputDto = new ItemInputDto();
+        updatedItemInputDto.setName("Updated Test Item");
+        updatedItemInputDto.setAvailable(false);
+
+        ItemOutputDto updatedItemOutputDto = itemService.update(userId, itemId, updatedItemInputDto);
+        assertNotNull(updatedItemOutputDto);
+        assertEquals(updatedItemInputDto.getName(), updatedItemOutputDto.getName());
+        assertEquals(itemInputDto.getDescription(), updatedItemOutputDto.getDescription());
+        assertEquals(updatedItemInputDto.getAvailable(), updatedItemOutputDto.getAvailable());
+    }
+
+    @Test
     void testDeleteItem() {
         itemService.deleteById(userId, itemId);
         assertThrows(NotFoundException.class, () -> itemService.getById(itemId));
